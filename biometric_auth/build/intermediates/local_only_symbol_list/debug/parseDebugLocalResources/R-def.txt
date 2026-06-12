@@ -1,0 +1,33 @@
+R_DEF: Internal format may change without notice
+local
+anim anim_shake
+color biometric_dot_filled
+color biometric_error
+color biometric_success
+dimen pin_dot_margin
+dimen pin_dot_size
+drawable ic_backspace
+drawable pin_dot_empty
+drawable pin_dot_filled
+id btn_0
+id btn_1
+id btn_2
+id btn_3
+id btn_4
+id btn_5
+id btn_6
+id btn_7
+id btn_8
+id btn_9
+id btn_cancel
+id btn_confirm
+id btn_delete
+id dialog_subtitle
+id dialog_title
+id dot_container
+id keypad_table
+id lockout_timer
+layout dialog_pin_auth
+string biometric_auth_library_name
+string lockout_timer_text
+style ShapeAppearance.Biometric.Circle

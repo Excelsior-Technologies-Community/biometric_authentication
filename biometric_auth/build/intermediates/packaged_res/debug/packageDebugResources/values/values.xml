@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="biometric_dot_filled">#6200EE</color>
+    <color name="biometric_error">#F44336</color>
+    <color name="biometric_success">#4CAF50</color>
+    <dimen name="pin_dot_margin">8dp</dimen>
+    <dimen name="pin_dot_size">16dp</dimen>
+    <string name="biometric_auth_library_name">Biometric Auth</string>
+    <string name="lockout_timer_text">Too many failed attempts. Try again in %d seconds</string>
+    <style name="ShapeAppearance.Biometric.Circle" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

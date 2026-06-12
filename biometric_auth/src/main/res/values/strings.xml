@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="biometric_auth_library_name">Biometric Auth</string>
+    <string name="lockout_timer_text">Too many failed attempts. Try again in %d seconds</string>
+</resources>
