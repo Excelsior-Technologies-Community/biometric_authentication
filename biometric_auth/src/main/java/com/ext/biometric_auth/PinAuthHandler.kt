@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import com.ext.biometric_auth.databinding.DialogPinAuthBinding
 import com.google.android.material.button.MaterialButton
 import java.io.Serializable
 
@@ -65,13 +66,9 @@ class PinAuthDialogFragment : DialogFragment() {
     
     private val enteredPin = StringBuilder()
     
-    private lateinit var titleView: TextView
-    private lateinit var subtitleView: TextView
-    private lateinit var dotContainer: LinearLayout
-    private lateinit var lockoutTimerView: TextView
-    private lateinit var btnConfirm: MaterialButton
-    private lateinit var btnCancel: MaterialButton
-    private lateinit var btnDelete: MaterialButton
+    private var _binding: DialogPinAuthBinding? = null
+    private val binding get() = _binding!!
+
     private val keypadButtons = ArrayList<MaterialButton>()
     private var countDownTimer: CountDownTimer? = null
     
@@ -105,7 +102,8 @@ class PinAuthDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.dialog_pin_auth, container, false)
+        _binding = DialogPinAuthBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onStart() {
@@ -121,37 +119,28 @@ class PinAuthDialogFragment : DialogFragment() {
         val storageManager = SecureStorageManager(requireContext())
         lockoutManager = LockoutManager(storageManager, config)
 
-        titleView = view.findViewById(R.id.dialog_title)
-        subtitleView = view.findViewById(R.id.dialog_subtitle)
-        dotContainer = view.findViewById(R.id.dot_container)
-        lockoutTimerView = view.findViewById(R.id.lockout_timer)
-        btnConfirm = view.findViewById(R.id.btn_confirm)
-        btnCancel = view.findViewById(R.id.btn_cancel)
-        btnDelete = view.findViewById(R.id.btn_delete)
-
-        val btnIds = listOf(
-            R.id.btn_0, R.id.btn_1, R.id.btn_2, R.id.btn_3, R.id.btn_4,
-            R.id.btn_5, R.id.btn_6, R.id.btn_7, R.id.btn_8, R.id.btn_9
+        val buttons = listOf(
+            binding.btn0, binding.btn1, binding.btn2, binding.btn3, binding.btn4,
+            binding.btn5, binding.btn6, binding.btn7, binding.btn8, binding.btn9
         )
         
-        for (id in btnIds) {
-            val btn = view.findViewById<MaterialButton>(id)
+        for (btn in buttons) {
             keypadButtons.add(btn)
             btn.setOnClickListener {
                 handleNumberClick(btn.text.toString())
             }
         }
 
-        btnDelete.setOnClickListener {
+        binding.btnDelete.setOnClickListener {
             handleDeleteClick()
         }
 
-        btnCancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             callback?.onCancelled()
             dismiss()
         }
 
-        btnConfirm.setOnClickListener {
+        binding.btnConfirm.setOnClickListener {
             submitPin()
         }
 
@@ -164,24 +153,24 @@ class PinAuthDialogFragment : DialogFragment() {
     private fun updateLabelsForMode() {
         when (currentMode) {
             PinDialogMode.SETUP -> {
-                titleView.text = "Create PIN"
-                subtitleView.text = "Enter a new 4-8 digit security PIN"
+                binding.dialogTitle.text = "Create PIN"
+                binding.dialogSubtitle.text = "Enter a new 4-8 digit security PIN"
             }
             PinDialogMode.CONFIRM_SETUP -> {
-                titleView.text = "Confirm PIN"
-                subtitleView.text = "Re-enter your PIN to verify"
+                binding.dialogTitle.text = "Confirm PIN"
+                binding.dialogSubtitle.text = "Re-enter your PIN to verify"
             }
             PinDialogMode.VERIFY -> {
-                titleView.text = config.title
-                subtitleView.text = config.subtitle
+                binding.dialogTitle.text = config.title
+                binding.dialogSubtitle.text = config.subtitle
             }
             PinDialogMode.RESET -> {
-                titleView.text = "Reset PIN"
-                subtitleView.text = "Enter your current PIN to authenticate"
+                binding.dialogTitle.text = "Reset PIN"
+                binding.dialogSubtitle.text = "Enter your current PIN to authenticate"
             }
             PinDialogMode.REMOVE -> {
-                titleView.text = "Remove PIN"
-                subtitleView.text = "Enter your current PIN to remove lock"
+                binding.dialogTitle.text = "Remove PIN"
+                binding.dialogSubtitle.text = "Enter your current PIN to remove lock"
             }
         }
     }
@@ -203,7 +192,7 @@ class PinAuthDialogFragment : DialogFragment() {
     }
 
     private fun updatePinDots() {
-        dotContainer.removeAllViews()
+        binding.dotContainer.removeAllViews()
         val totalDots = maxOf(4, enteredPin.length)
         val primaryColor = getThemeColor(requireContext(), android.R.attr.colorPrimary, Color.BLUE)
 
@@ -226,7 +215,7 @@ class PinAuthDialogFragment : DialogFragment() {
                     setBackgroundResource(R.drawable.pin_dot_empty)
                 }
             }
-            dotContainer.addView(dotView)
+            binding.dotContainer.addView(dotView)
         }
     }
 
@@ -241,7 +230,7 @@ class PinAuthDialogFragment : DialogFragment() {
     }
 
     private fun updateConfirmButtonState() {
-        btnConfirm.isEnabled = enteredPin.length in 4..8
+        binding.btnConfirm.isEnabled = enteredPin.length in 4..8
     }
 
     private fun checkLockoutState() {
@@ -254,23 +243,23 @@ class PinAuthDialogFragment : DialogFragment() {
             startLockoutTimer(remaining)
         } else {
             enableKeypad(true)
-            lockoutTimerView.visibility = View.GONE
+            binding.lockoutTimer.visibility = View.GONE
         }
     }
 
     private fun startLockoutTimer(millis: Long) {
         enableKeypad(false)
-        lockoutTimerView.visibility = View.VISIBLE
+        binding.lockoutTimer.visibility = View.VISIBLE
         
         countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(millis, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val seconds = (millisUntilFinished / 1000).coerceAtLeast(1)
-                lockoutTimerView.text = getString(R.string.lockout_timer_text, seconds)
+                binding.lockoutTimer.text = getString(R.string.lockout_timer_text, seconds)
             }
 
             override fun onFinish() {
-                lockoutTimerView.visibility = View.GONE
+                binding.lockoutTimer.visibility = View.GONE
                 enableKeypad(true)
                 lockoutManager.resetAttempts()
                 updatePinDots()
@@ -282,10 +271,10 @@ class PinAuthDialogFragment : DialogFragment() {
         for (btn in keypadButtons) {
             btn.isEnabled = enabled
         }
-        btnDelete.isEnabled = enabled
-        btnCancel.isEnabled = true
+        binding.btnDelete.isEnabled = enabled
+        binding.btnCancel.isEnabled = true
         if (!enabled) {
-            btnConfirm.isEnabled = false
+            binding.btnConfirm.isEnabled = false
         } else {
             updateConfirmButtonState()
         }
@@ -354,17 +343,17 @@ class PinAuthDialogFragment : DialogFragment() {
 
     private fun showErrorFeedback(message: String? = null) {
         val shake = AnimationUtils.loadAnimation(context, R.anim.anim_shake)
-        dotContainer.startAnimation(shake)
+        binding.dotContainer.startAnimation(shake)
         
-        for (i in 0 until dotContainer.childCount) {
-            val dotView = dotContainer.getChildAt(i)
+        for (i in 0 until binding.dotContainer.childCount) {
+            val dotView = binding.dotContainer.getChildAt(i)
             dotView.backgroundTintList = ColorStateList.valueOf(config.errorColor)
         }
         
         enteredPin.clear()
         updateConfirmButtonState()
         
-        dotContainer.postDelayed({
+        binding.dotContainer.postDelayed({
             if (isAdded) {
                 if (lockoutManager.isLockedOut()) {
                     checkLockoutState()
@@ -376,7 +365,8 @@ class PinAuthDialogFragment : DialogFragment() {
     }
 
     override fun onDestroyView() {
-        countDownTimer?.cancel()
         super.onDestroyView()
+        countDownTimer?.cancel()
+        _binding = null
     }
 }

@@ -24,30 +24,27 @@ The library strictly adheres to the principle of never storing plaintext PINs. I
 
 ## Installation
 
-### 1. Register the Module in settings.gradle.kts
-Add `:biometric_auth` to your `settings.gradle.kts` file:
-```kotlin
-include(":app")
-include(":biometric_auth")
-```
+#### 1. Add JitPack Repository
+Add the JitPack repository to your root `settings.gradle.kts` file under the `dependencyResolutionManagement` block:
 
-### 2. Add Dependencies
-Include the library module in your application module's `build.gradle.kts`:
 ```kotlin
-dependencies {
-    implementation(project(":biometric_auth"))
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
 }
 ```
 
-Ensure your version catalogs (`libs.versions.toml`) declare:
-```toml
-[versions]
-biometric = "1.2.0-alpha05"
-securityCrypto = "1.1.0-alpha06"
+#### 2. Add Dependency
+Add the library dependency to your application module's `build.gradle.kts` file:
 
-[libraries]
-androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
-androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+```kotlin
+dependencies {
+    implementation("com.github.Excelsior-Technologies-Community:biometric_authentication:1.0.0")
+}
 ```
 
 ---
